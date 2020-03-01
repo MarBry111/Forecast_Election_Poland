@@ -15,6 +15,7 @@ clinets = ['56d00aa0-b498-449b-2f52-08d7649f3c05',
            'a1e145a2-e602-491c-2f51-08d7649f3c05',
            '95e1e284-3c48-4d3e-2f4f-08d7649f3c05']
 
+
 def get_request(URL, flag=False):
     # location given here 
     location = 'HTTP/1.1'
