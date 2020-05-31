@@ -97,9 +97,13 @@ features = [['155055', 'emeryci_i_rencisci'], #przeciętna liczba emerytów i re
             ['216972', 'socjal'], # (NUTS 2)
             ['458417', 'dochody_brutto_na_mieszkanca'], # (NUTS 2) dochody do dyspozycji brutto na 1 mieszkańca
             ['458421', 'PKB_na_1_mieszkanca'],  # (NUTS 2)
+            ['458430', 'PKB_na_1_mieszkanca_ceny_stale'],  # (NUTS 2)
+            ['469418', 'PKB_na_1_mieszkanca_szacunki'],  # (NUTS 2)
             ['58559', 'przestepstwa_ogolem'] # (NUTS 3, powiaty, 2002 -)
             ]
-
+'''
 for f in [features[-1]]:
     print(f)
     get_data(f[0], f[1])
+'''
+get_data('469418', 'PKB_na_1_mieszkanca_szacunki')
