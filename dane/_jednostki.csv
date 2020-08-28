@@ -1,0 +1,43 @@
+
+nr;okręgi;powiaty;województwo
+1;Legnica;"powiaty: bolesławiecki, głogowski, jaworski, jeleniogórski, kamiennogórski, legnicki, lubański, lubiński, lwówecki, polkowicki, zgorzelecki i złotoryjski; miasta na prawach powiatu: Jelenia Góra i Legnica";dolnośląskie
+2;Wałbrzych;"powiaty: dzierżoniowski, kłodzki, świdnicki, wałbrzyski i ząbkowicki; miasto na prawach powiatu: Wałbrzych";dolnośląskie
+3;Wrocław;"powiaty: górowski, milicki, oleśnicki, oławski, strzeliński, średzki, trzebnicki, wołowski i wrocławski; miasto na prawach powiatu: Wrocław";dolnośląskie
+4;Bydgoszcz;"powiaty: bydgoski, inowrocławski, mogileński, nakielski, sępoleński, świecki, tucholski i żniński; miasto na prawach powiatu: Bydgoszcz";kujawsko-pomorskie
+5;Toruń;"powiaty: aleksandrowski, brodnicki, chełmiński, golubsko-dobrzyński, grudziądzki, lipnowski, radziejowski, rypiński, toruński, wąbrzeski i włocławski; miasta na prawach powiatu: Grudziądz, Toruń i Włocławek";kujawsko-pomorskie
+6;Lublin;"powiaty: janowski, kraśnicki, lubartowski, lubelski, łęczyński, łukowski, opolski, puławski, rycki i świdnicki; miasto na prawach powiatu: Lublin";lubelskie
+7;Chełm;"powiaty: bialski, biłgorajski, chełmski, hrubieszowski, krasnostawski, parczewski, radzyński, tomaszowski, włodawski i zamojski; miasta na prawach powiatu: Biała Podlaska, Chełm i Zamość";lubelskie
+8;Zielona Góra;województwo lubuskie;lubuskie
+9;Łódź;"powiaty: brzeziński i łódzki wschodni; miasto na prawach powiatu: Łódź";łódzkie
+10;Piotrków Trybunalski;"powiaty: bełchatowski, opoczyński, piotrkowski, radomszczański, rawski, skierniewicki i tomaszowski; miasta na prawach powiatu: Piotrków Trybunalski i Skierniewice";łódzkie
+11;Sieradz;powiaty: kutnowski, łaski, łęczycki, łowicki, pabianicki, pajęczański, poddębicki, sieradzki, wieluński, wieruszowski, zduńskowolski i zgierski;łódzkie
+12;Chrzanów;powiaty: chrzanowski, myślenicki, oświęcimski, suski i wadowicki;małopolskie
+13;Kraków;"powiaty: krakowski, miechowski i olkuski; miasto na prawach powiatu: Kraków";małopolskie
+14;Nowy Sącz;"powiaty: gorlicki, limanowski, nowosądecki, nowotarski i tatrzański; miasto na prawach powiatu: Nowy Sącz";małopolskie
+15;Tarnów;"powiaty: bocheński, brzeski, dąbrowski, proszowicki, tarnowski i wielicki; miasto na prawach powiatu: Tarnów";małopolskie
+16;Płock;"powiaty: ciechanowski, gostyniński, mławski, płocki, płoński, przasnyski, sierpecki, sochaczewski, żuromiński i żyrardowski; miasto na prawach powiatu: Płock";mazowieckie
+17;Radom;"powiaty: białobrzeski, grójecki, kozienicki, lipski, przysuski, radomski, szydłowiecki i zwoleński; miasto na prawach powiatu: Radom";mazowieckie
+18;Siedlce;"powiaty: garwoliński, łosicki, makowski, miński, ostrołęcki, ostrowski, pułtuski, siedlecki, sokołowski, węgrowski i wyszkowski; miasta na prawach powiatu: Ostrołęka i Siedlce";mazowieckie
+19;Warszawa I;miasto na prawach powiatu: Warszawa;Warszawa
+20;Warszawa II;powiaty: grodziski, legionowski, nowodworski, otwocki, piaseczyński, pruszkowski, warszawski zachodni i wołomiński;Warszawa
+21;Opole;województwo opolskie;opolskie
+22;Krosno;"powiaty: bieszczadzki, brzozowski, jarosławski, jasielski, krośnieński, leski, lubaczowski, przemyski, przeworski i sanocki; miasta na prawach powiatu: Krosno i Przemyśl";podkarpackie
+23;Rzeszów;"powiaty: dębicki, kolbuszowski, leżajski, łańcucki, mielecki, niżański, ropczycko-sędziszowski, rzeszowski, stalowowolski, strzyżowski i tarnobrzeski; miasta na prawach powiatu: Rzeszów i Tarnobrzeg";podkarpackie
+24;Białystok;województwo podlaskie;podlaskie
+25;Gdańsk;"powiaty: gdański, kwidzyński, malborski, nowodworski, starogardzki, sztumski i tczewski; miasta na prawach powiatu: Gdańsk i Sopot";pomorskie
+26;Gdynia;"powiaty: bytowski, chojnicki, człuchowski, kartuski, kościerski, lęborski, pucki, słupski i wejherowski; miasta na prawach powiatu: Gdynia i Słupsk";pomorskie
+27;Bielsko-Biała;"powiaty: bielski, cieszyński, pszczyński i żywiecki; miasto na prawach powiatu: Bielsko-Biała";śląskie
+28;Częstochowa;"powiaty: częstochowski, kłobucki, lubliniecki i myszkowski; miasto na prawach powiatu: Częstochowa";śląskie
+29;Gliwice;"powiaty: gliwicki i tarnogórski; miasta na prawach powiatu: Bytom, Gliwice i Zabrze";śląskie
+30;Rybnik;"powiaty: mikołowski, raciborski, rybnicki i wodzisławski; miasta na prawach powiatu: Jastrzębie-Zdrój, Rybnik i Żory";śląskie
+31;Katowice;"powiat bieruńsko-lędziński; miasta na prawach powiatu: Chorzów, Katowice, Mysłowice, Piekary Śląskie, Ruda Śląska, Siemianowice Śląskie, Świętochłowice i Tychy";śląskie
+32;Sosnowiec;"powiaty: będziński i zawierciański; miasta na prawach powiatu: Dąbrowa Górnicza, Jaworzno i Sosnowiec";śląskie
+33;Kielce;województwo świętokrzyskie;świętokrzyskie
+34;Elbląg;"powiaty: bartoszycki, braniewski, działdowski, elbląski, iławski, lidzbarski, nowomiejski i ostródzki; miasto na prawach powiatu: Elbląg";warmińsko-mazurskie
+35;Olsztyn;"powiaty: ełcki, giżycki, gołdapski, kętrzyński, mrągowski, nidzicki, olecki, olsztyński, piski, szczycieński i węgorzewski; miasta na prawach powiatu: Ełk i Olsztyn";warmińsko-mazurskie
+36;Kalisz;"powiaty: gostyński, jarociński, kaliski, kępiński, kościański, krotoszyński, leszczyński, ostrowski, ostrzeszowski, pleszewski i rawicki; miasta na prawach powiatu: Kalisz i Leszno";wielkopolskie
+37;Konin;"powiaty: gnieźnieński, kolski, koniński, słupecki, średzki, śremski, turecki i wrzesiński; miasto na prawach powiatu: Konin";wielkopolskie
+38;Piła;powiaty: chodzieski, czarnkowsko-trzcianecki, grodziski, międzychodzki, nowotomyski, obornicki, pilski, szamotulski, wągrowiecki, wolsztyński i złotowski;wielkopolskie
+39;Poznań;"powiat poznański; miasto na prawach powiatu: Poznań";wielkopolskie
+40;Koszalin;"powiaty: białogardzki, choszczeński, drawski, kołobrzeski, koszaliński, sławieński, szczecinecki, świdwiński i wałecki; miasto na prawach powiatu: Koszalin";zachodniopomorskie
+41;Szczecin;"powiaty: goleniowski, gryficki, gryfiński, kamieński, łobeski, myśliborski, policki, pyrzycki i stargardzki; miasta na prawach powiatu: Szczecin i Świnoujście";zachodniopomorskie
