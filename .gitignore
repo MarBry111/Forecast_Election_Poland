@@ -1,4 +1,3 @@
-*.csv
 .ipynb_checkpoints
 dane_pdf/*
 papery/*
