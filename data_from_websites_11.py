@@ -14,9 +14,9 @@ main_page_url = base_url+'pl/000000.html'
 page = requests.get(main_page_url)
 page.encoding = 'utf-8'
 
-path_0 = '/home/marek/Dokumenty/MGR_CLEAN/wyniki_wyborow/2011/'
+path_0 = 'wyniki_wyborow/2011/'
 #<a href="../../rfl/000000/pl/725c4668ea3ae43c83d5d5b737d3e93d.html">Komitet Wyborczy Prawo i Sprawiedliwość</a></td><td class="all_right">4 295 016</td>
-wojew = re.findall(r'<a href=".*.html">([\w ]+)</a></td><td class="all_right">([0-9\s ]*)', page.text)
+wojew = re.findall(r'<a href=".*.html">([\w\-80 ]+)</a></td><td class="all_right">([0-9\s ]*)', page.text)
 df_0 = pd.DataFrame(wojew, columns =['Komitet', 'Glosy']) 
 df_0.Glosy = df_0.Glosy.str.replace('\s', '')
 
@@ -40,7 +40,7 @@ def process_district(jednostka):
     subpage.encoding = 'utf-8'
 
     #<a  class='top-bg' href="/rfl/pl/d46c53b10b6319f90c12824972b3e31e.html" title="Wyniki głosowania na listę">Komitet Wyborczy Prawica</a> - Zarejestrowana</td>
-    komitety = re.findall(r'''<a  class='top-bg' href="/rfl/pl/.*.html" title="Wyniki głosowania na listę">([\w\- ]+)</a>''', subpage.text)
+    komitety = re.findall(r'''<a  class='top-bg' href="/rfl/pl/.*.html" title="Wyniki głosowania na listę">([\w\-80 ]+)</a>''', subpage.text)
     #<a class="glob" href="/rfl/pl/7de3c03a29db80585deab9bfac6b66c2.html" title="Wyniki głosowania na listę"><strong>158 938</strong></a></td>
     glosy = re.findall(r'''<strong>([0-9]*.[^%]+[0-9]*)</strong></a>''', subpage.text)
     glosy = [g.replace("\xa0", '') for g in glosy]
@@ -65,7 +65,7 @@ def process_district(jednostka):
         subsubpage = requests.get(subsubpage_url)
         subsubpage.encoding = 'utf-8'
 
-        komitety_2 = re.findall(r'''<a  class='top-bg' href="/rfl/pl/.*.html" title="Wyniki głosowania na listę">([\w\- ]+)</a>''', subpage.text)
+        komitety_2 = re.findall(r'''<a  class='top-bg' href="/rfl/pl/.*.html" title="Wyniki głosowania na listę">([\w\-80 ]+)</a>''', subpage.text)
         glosy_2 = re.findall(r'''<strong>([0-9]*.[^%]+[0-9]*)</strong></a>''', subpage.text)
         glosy_2 = [g.replace("\xa0", '') for g in glosy_2]
         df_2 = pd.DataFrame({'Komitet' : komitety,
@@ -86,7 +86,7 @@ def process_district(jednostka):
                 subsubsubpage = requests.get(subsubsubpage_url)
                 subsubsubpage.encoding = 'utf-8'
                 
-                komitety_3 = re.findall(r'''<a  class='top-bg' href="/rfl/pl/.*.html" title="Wyniki głosowania na listę">([\w\- ]+)</a>''', subpage.text)
+                komitety_3 = re.findall(r'''<a  class='top-bg' href="/rfl/pl/.*.html" title="Wyniki głosowania na listę">([\w\-80 ]+)</a>''', subpage.text)
                 glosy_3 = re.findall(r'''<strong>([0-9]*.[^%]+[0-9]*)</strong></a>''', subpage.text)
                 glosy_3 = [g.replace("\xa0", '') for g in glosy_3]
                 df_3 = pd.DataFrame({'Komitet' : komitety,

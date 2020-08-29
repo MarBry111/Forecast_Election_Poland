@@ -15,9 +15,9 @@ main_page_url = base_url+'index.htm'
 page = requests.get(main_page_url)
 page.encoding = 'utf-8'
 
-path_0 = '/home/marek/Dokumenty/MGR_CLEAN/wyniki_wyborow/2007/'
+path_0 = 'wyniki_wyborow/2007/'
 
-wojew = re.findall(r'<td class="col4al"><a href=".*.htm" class="link1">([\w\- ]+)</a></td><td class="col5ar">([0-9]*)</td>', page.text)
+wojew = re.findall(r'<td class="col4al"><a href=".*.htm" class="link1">([\w\-\+\" ]+)</a></td><td class="col5ar">([0-9]*)</td>', page.text)
 df_0 = pd.DataFrame(wojew, columns =['Komitet', 'Glosy']) 
 
 df_0.to_csv(path_0+'Polska.csv')
@@ -37,7 +37,7 @@ def process_district(jednostka):
     subpage = requests.get(subpage_url)
     subpage.encoding = 'utf-8'
     #<a href="../../WYN/W85/1.htm" class="link1">Komitet Wyborczy Ruch Patriotyczny</a>
-    komitety = re.findall(r'<td class="col4al"><a href=".*.htm" class="link1">([\w\- ]+)</a></td><td class="col5ar">([0-9]*)</td>', subpage.text)
+    komitety = re.findall(r'<td class="col4al"><a href=".*.htm" class="link1">([\w\-\+\" ]+)</a></td><td class="col5ar">([0-9]*)</td>', subpage.text)
     df = pd.DataFrame(komitety, columns =['Komitet', 'Glosy']) 
     
     woj = jednostka[1].replace(" ", "_")
@@ -56,7 +56,7 @@ def process_district(jednostka):
         subsubpage = requests.get(subsubpage_url)
         subsubpage.encoding = 'utf-8'
         
-        komitety_2 = re.findall(r'<td class="col4al"><a href=".*.htm" class="link1">([\w\- ]+)</a></td><td class="col5ar">([0-9]*)</td>', subsubpage.text)
+        komitety_2 = re.findall(r'<td class="col4al"><a href=".*.htm" class="link1">([\w\-\+\" ]+)</a></td><td class="col5ar">([0-9]*)</td>', subsubpage.text)
         df_2 = pd.DataFrame(komitety_2, columns =['Komitet', 'Glosy']) 
         df_2.to_csv(subpath+'/'+powiat[1]+'.csv')
         
@@ -72,7 +72,7 @@ def process_district(jednostka):
             subsubsubpage = requests.get(subsubsubpage_url)
             subsubsubpage.encoding = 'utf-8'
             
-            komitety_3 = re.findall(r'<td class="col4al"><a href=".*.htm" class="link1">([\w\- ]+)</a></td><td class="col5ar">([0-9]*)</td>', subsubsubpage.text)
+            komitety_3 = re.findall(r'<td class="col4al"><a href=".*.htm" class="link1">([\w\-\+\" ]+)</a></td><td class="col5ar">([0-9]*)</td>', subsubsubpage.text)
             df_3 = pd.DataFrame(komitety_3, columns =['Komitet', 'Glosy']) 
             df_3.to_csv(subsubpath+'/'+gmina[1]+'.csv')
         
