@@ -1,7 +1,7 @@
 import pandas as pd 
 import numpy as np 
 
-def party_in_region(df_vote, df_pool):
+def party_in_region(df_vote, df_poll):
     '''
     INPUT:
     Poll:
@@ -38,7 +38,7 @@ def party_in_region(df_vote, df_pool):
     return 0
 
 
-def region_in_party(df_vote, df_pool):
+def region_in_party(df_vote, df_poll):
     '''
     INPUT:
     Poll:
