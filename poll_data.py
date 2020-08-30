@@ -35,7 +35,13 @@ def party_in_region(df_vote, df_poll):
 
         gni = pi * Gni / sum_j( pj * Gnj )
     '''
-    return 0
+    df_cal = df_vote.div(df_vote.sum(axis=1), axis=0).fillna(0)
+
+    df_out = df_cal * df_poll.to_list()
+
+    df_out = df_out.div(df_out.sum(axis=1), axis=0).fillna(0)
+
+    return df_out
 
 
 def region_in_party(df_vote, df_poll):
@@ -72,4 +78,10 @@ def region_in_party(df_vote, df_poll):
 
         uni = pi * Ui / sum_j( pj * Unj )
     '''
-    return 0
+    df_cal = df_vote.div(df_vote.sum(axis=0), axis=1).fillna(0)
+
+    df_out = df_cal * df_poll.to_list()
+
+    df_out = df_out.div(df_out.sum(axis=1), axis=0).fillna(0)
+
+    return df_out
