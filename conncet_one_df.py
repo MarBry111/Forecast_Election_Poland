@@ -23,7 +23,8 @@ def connect_one_df(year):
 		if os.path.isdir(folder+o):
 			folder_1 = folder+o+'/'
 			powiaty = os.listdir(folder_1)
-			dfTOTAL = pd.concat([dfTOTAL, add_name_of_district(fol =folder_1, ok = powiaty ,d = 'O_')])
+			#dfTOTAL = pd.concat([dfTOTAL, add_name_of_district(fol =folder_1, ok = powiaty ,d = 'O_')])
+			dfTOTAL = pd.concat([dfTOTAL, add_name_of_district(fol =folder_1, ok = powiaty ,d = '')])
 			'''
 			for p in powiaty:
 				if os.path.isdir(folder_1+p):
@@ -37,7 +38,10 @@ def connect_one_df(year):
 							dfTOTAL = pd.concat([dfTOTAL, add_name_of_district(fol =folder_3, ok = gminy ,d = 'G_')])
 					'''
 
-	dfTOTAL.to_csv(year+'_O.csv', encoding='utf-8')
+	dfTOTAL.to_csv(year+'_W.csv', encoding='utf-8')
 
-for y in ['2005', '2007', '2011']:
+years = ['2005', '2007', '2011']
+years = ['2001']
+
+for y in years:
 	connect_one_df(y)
