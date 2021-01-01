@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from poll_data import party_in_region, region_in_party
 import pickle
-#from numba import jit
+from tqdm import tqdm
 
 import multiprocessing as mp
 
@@ -48,13 +48,15 @@ def save_file(func, X, Y, neigh_ndx, fn, iter=1000):
 
     #fire off workers
     jobs = []
-    for i in range(iter):
-        job = pool.apply_async(func, (X, Y, i, q, neigh_ndx))
-        jobs.append(job)
+    with tqdm(total=iter) as pbar:
+        for i in range(iter):
+            job = pool.apply_async(func, (X, Y, i, q, neigh_ndx))
+            jobs.append(job)
 
     # collect results from the workers through the pool result queue
-    for job in jobs: 
-        job.get()
+        for job in jobs: 
+            job.get()
+            pbar.update()
 
     #now we are done, kill the listener
     q.put('kill')
@@ -323,6 +325,7 @@ def program_finall():
     for fun, fil in zip(fun_list,fil_list):
         # base file 
         bf = 'model/model1/'+fil 
+        print(fil)
         save_file(fun, X, Y, neigh_ndx, fn=bf, iter=1000)
 
 program_finall()
