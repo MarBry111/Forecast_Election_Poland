@@ -8,7 +8,7 @@ from tqdm import tqdm
 import multiprocessing as mp
 
 fn = 'model/model1/arr.txt'
-step = 0.1
+step = 1
 
 def listener(q, fn):
     '''listens for messages on the q, writes to file. '''
@@ -22,25 +22,11 @@ def listener(q, fn):
             f.write(str(m) + '\n')
             f.flush()
 
-def worker_changed(arg, q):
-    '''stupidly simulates long running process'''
-    '''
-    s = 'this is a test'
-    txt = s + str(arg)
-    for i in range(200000):
-        txt += s 
-    with open(fn, 'rb') as f:
-        size = len(f.read())
-    res = 'Process' + str(arg), str(size), done
-    '''
-    res = str(arg)+' '
-    q.put(res)
-    return res
 
-def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=1000):
+def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=100):
     #must use Manager queue here, or will not work
     manager = mp.Manager()
-    q = manager.Queue()    
+    q = manager.Queue(1)    
     pool = mp.Pool(mp.cpu_count() + 2)
 
     #put listener to work first
@@ -49,8 +35,8 @@ def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=1000):
     #fire off workers
     jobs = []
     with tqdm(total=iter) as pbar:
-        for i in range(iter):
-            job = pool.apply_async(func, (X, Y, i, q, neigh_ndx, voter_w))
+        for j in range(iter):
+            job = pool.apply_async(func, (X, Y, j, q, neigh_ndx, voter_w))
             jobs.append(job)
 
     # collect results from the workers through the pool result queue
@@ -223,8 +209,9 @@ def model(a,x,Y,neigh_ndx):
         out[year] = y
     return loss, out
 
-def all_at_once(X, Y, i, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18))
+def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18)) 
+    np.random.seed(j)
     a_avg = np.random.rand(X.shape[1],X.shape[2])
 
     for epoch in range(10):
@@ -249,7 +236,7 @@ def all_at_once(X, Y, i, q, neigh_ndx, voter_w):
     l, o = model(a_avg,X,Y,neigh_ndx)
 
     txt_to_be_saved = (
-        str(i)
+        str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
         +''
@@ -260,8 +247,9 @@ def all_at_once(X, Y, i, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def each_year_no_time(X, Y, i, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18))
+def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18)) 
+    np.random.seed(j)
 
     a_all = np.random.rand(X.shape[1],X.shape[2])
     loss_l = np.inf
@@ -296,7 +284,7 @@ def each_year_no_time(X, Y, i, q, neigh_ndx, voter_w):
     l, o = model(a_all,X,Y,neigh_ndx)
 
     txt_to_be_saved = (
-        str(i)
+        str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
         +''
@@ -307,8 +295,9 @@ def each_year_no_time(X, Y, i, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def output_input_each_step(X, Y, i, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18))
+def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18)) 
+    np.random.seed(j)
 
     a_step = np.random.rand(X.shape[1],X.shape[2])
     loss_l = np.inf
@@ -341,7 +330,7 @@ def output_input_each_step(X, Y, i, q, neigh_ndx, voter_w):
     l, o = model(a_step,X,Y,neigh_ndx)
 
     txt_to_be_saved = (
-        str(i)
+        str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
         +''
@@ -352,8 +341,9 @@ def output_input_each_step(X, Y, i, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def output_input_each_epoch(X, Y, i, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18))
+def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18)) 
+    np.random.seed(j)
 
     a_nxt = np.random.rand(X.shape[1],X.shape[2])
     loss_l = np.inf
@@ -372,7 +362,7 @@ def output_input_each_epoch(X, Y, i, q, neigh_ndx, voter_w):
         grad = np.sum(grad, axis=0)
         
         if loss_p > loss_l: 
-            print('loss sum:',loss_p)
+            #print('loss sum:',loss_p)
             break
         a_nxt = a_nxt - step*grad
         loss_l = loss_p
@@ -386,7 +376,7 @@ def output_input_each_epoch(X, Y, i, q, neigh_ndx, voter_w):
     l, o = model(a_nxt,X,Y,neigh_ndx)
 
     txt_to_be_saved = (
-        str(i)
+        str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
         +''
@@ -397,8 +387,9 @@ def output_input_each_epoch(X, Y, i, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def output_input_each_step_lin_w(X, Y, i, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18))
+def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18)) 
+    np.random.seed(j)
 
     a_step_wgth = np.random.rand(X.shape[1],X.shape[2])
     loss_l = np.inf
@@ -430,7 +421,7 @@ def output_input_each_step_lin_w(X, Y, i, q, neigh_ndx, voter_w):
     l, o = model(a_step_wgth,X,Y,neigh_ndx)
 
     txt_to_be_saved = (
-        str(i)
+        str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
         +''
@@ -441,8 +432,9 @@ def output_input_each_step_lin_w(X, Y, i, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def output_input_each_epoch_lin_w(X, Y, i, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18))
+def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18)) 
+    np.random.seed(j)
 
     a_wgth = np.random.rand(X.shape[1],X.shape[2])
     loss_l = np.inf
@@ -461,7 +453,7 @@ def output_input_each_epoch_lin_w(X, Y, i, q, neigh_ndx, voter_w):
         grad = np.sum(grad, axis=0)
         
         if loss_p > loss_l: 
-            print('loss sum:',loss_p)
+            #print('loss sum:',loss_p)
             break
         a_wgth = a_wgth - step*grad
         loss_l = loss_p
@@ -475,7 +467,7 @@ def output_input_each_epoch_lin_w(X, Y, i, q, neigh_ndx, voter_w):
     l, o = model(a_wgth,X,Y,neigh_ndx)
 
     txt_to_be_saved = (
-        str(i)
+        str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
         +''
@@ -519,6 +511,6 @@ def program_finall():
         # base file 
         bf = 'model/model1/'+fil 
         print(fil)
-        save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=1000)
+        save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=100)
 
 program_finall()
