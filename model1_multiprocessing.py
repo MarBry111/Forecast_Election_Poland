@@ -37,7 +37,7 @@ def worker_changed(arg, q):
     q.put(res)
     return res
 
-def save_file(func, X, Y, neigh_ndx, fn, iter=1000):
+def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=1000):
     #must use Manager queue here, or will not work
     manager = mp.Manager()
     q = manager.Queue()    
@@ -50,7 +50,7 @@ def save_file(func, X, Y, neigh_ndx, fn, iter=1000):
     jobs = []
     with tqdm(total=iter) as pbar:
         for i in range(iter):
-            job = pool.apply_async(func, (X, Y, i, q, neigh_ndx))
+            job = pool.apply_async(func, (X, Y, i, q, neigh_ndx, voter_w))
             jobs.append(job)
 
     # collect results from the workers through the pool result queue
@@ -65,6 +65,9 @@ def save_file(func, X, Y, neigh_ndx, fn, iter=1000):
 
 def prepare_data(pool_bool = True):
     #============= Prepare data ===================
+    # Voters 
+    voters = pd.read_csv('dane_years/voters/percent_voters.csv',header=None)
+
     # Stat data
     path = 'dane_years/'
     files = list(filter(lambda x: os.path.isfile(path+x), os.listdir(path)))
@@ -122,7 +125,7 @@ def prepare_data(pool_bool = True):
 
     pool_d = par_in_reg_list if (pool_bool) else reg_in_par_list 
 
-    return pool_data_middle, vote_list, neighbours, pool_d
+    return pool_data_middle, vote_list, neighbours, pool_d, voters[1].values
 
 def prepare_input_data(pool_data_middle,vote_list,neighbours,pool_d):
     X = []
@@ -220,7 +223,7 @@ def model(a,x,Y,neigh_ndx):
         out[year] = y
     return loss, out
 
-def all_at_once(X, Y, i, q, neigh_ndx):
+def all_at_once(X, Y, i, q, neigh_ndx, voter_w):
     arr_last = np.zeros((10,18))
     a_avg = np.random.rand(X.shape[1],X.shape[2])
 
@@ -241,7 +244,7 @@ def all_at_once(X, Y, i, q, neigh_ndx):
 
         #if epoch%1==0: print('loss sum:',loss_p)
         l, o = model(a_avg,X,Y,neigh_ndx)
-        arr_last[epoch] = np.mean(o,1).reshape(-1)
+        arr_last[epoch] = np.average(o,1, voter_w).reshape(-1)
 
     l, o = model(a_avg,X,Y,neigh_ndx)
 
@@ -250,14 +253,14 @@ def all_at_once(X, Y, i, q, neigh_ndx):
         +' '
         +np.array_str(arr_last).replace('\n',' ')
         +''
-        +np.array_str(np.mean(o,1).reshape(-1)).replace('\n',' '))
+        +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
 
     txt_to_be_saved = ' '.join(txt_to_be_saved.split())
 
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def each_year_no_time(X, Y, i, q, neigh_ndx):
+def each_year_no_time(X, Y, i, q, neigh_ndx, voter_w):
     arr_last = np.zeros((10,18))
 
     a_all = np.random.rand(X.shape[1],X.shape[2])
@@ -288,7 +291,7 @@ def each_year_no_time(X, Y, i, q, neigh_ndx):
             #print('loss sum:',loss_p)
             n = epoch//(100)
             l, o = model(a_all,X,Y,neigh_ndx)
-            arr_last[n] = np.mean(o,1).reshape(-1)
+            arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
     l, o = model(a_all,X,Y,neigh_ndx)
 
@@ -297,7 +300,186 @@ def each_year_no_time(X, Y, i, q, neigh_ndx):
         +' '
         +np.array_str(arr_last).replace('\n',' ')
         +''
-        +np.array_str(np.mean(o,1).reshape(-1)).replace('\n',' '))
+        +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
+
+    txt_to_be_saved = ' '.join(txt_to_be_saved.split())
+
+    q.put(txt_to_be_saved)
+    return txt_to_be_saved
+
+def output_input_each_step(X, Y, i, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18))
+
+    a_step = np.random.rand(X.shape[1],X.shape[2])
+    loss_l = np.inf
+    
+    for epoch in range(10**4):
+        loss_p = 0
+        y = Y[0]
+        for i in range(X.shape[0]):
+            xi = prepare_input(y, neigh_ndx)
+            y = model_percent(a_step,xi)
+
+            grad = grad_percent(a_step,xi,Y[i])#.reshape(18,16,3)
+            #grad = np.sum(grad, axis=0)
+            a_step = a_step - step*grad
+
+            loss_p += np.sum((model_percent(a_step,xi) - Y[i].reshape(-1,1))**2)
+
+        if loss_p > loss_l: 
+            #print('loss sum:',loss_p)
+            break
+
+        loss_l = loss_p
+
+        if epoch%1000==0: 
+            #print('loss sum:',loss_p)
+            n = epoch//(1000)
+            l, o = model(a_step,X,Y,neigh_ndx)
+            arr_last[n] = np.average(o,1, voter_w).reshape(-1)
+
+    l, o = model(a_step,X,Y,neigh_ndx)
+
+    txt_to_be_saved = (
+        str(i)
+        +' '
+        +np.array_str(arr_last).replace('\n',' ')
+        +''
+        +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
+
+    txt_to_be_saved = ' '.join(txt_to_be_saved.split())
+
+    q.put(txt_to_be_saved)
+    return txt_to_be_saved
+
+def output_input_each_epoch(X, Y, i, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18))
+
+    a_nxt = np.random.rand(X.shape[1],X.shape[2])
+    loss_l = np.inf
+    
+    for epoch in range(10**3):
+        loss_p = 0
+        y = Y[0]
+        grad = np.zeros(X[0].shape)
+        
+        for i in range(1,X.shape[0]):
+            xi = prepare_input(y,neigh_ndx)
+            y = model_percent(a_nxt,xi)
+            grad += grad_percent(a_nxt,xi,Y[i])
+            loss_p += np.sum((model_percent(a_nxt,xi) - Y[i].reshape(-1,1))**2)
+        
+        grad = np.sum(grad, axis=0)
+        
+        if loss_p > loss_l: 
+            print('loss sum:',loss_p)
+            break
+        a_nxt = a_nxt - step*grad
+        loss_l = loss_p
+
+        if epoch%100==0: 
+            #print('loss sum:',loss_p)
+            n = epoch//(100)
+            l, o = model(a_nxt,X,Y,neigh_ndx)
+            arr_last[n] = np.average(o,1, voter_w).reshape(-1)
+
+    l, o = model(a_nxt,X,Y,neigh_ndx)
+
+    txt_to_be_saved = (
+        str(i)
+        +' '
+        +np.array_str(arr_last).replace('\n',' ')
+        +''
+        +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
+
+    txt_to_be_saved = ' '.join(txt_to_be_saved.split())
+
+    q.put(txt_to_be_saved)
+    return txt_to_be_saved
+
+def output_input_each_step_lin_w(X, Y, i, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18))
+
+    a_step_wgth = np.random.rand(X.shape[1],X.shape[2])
+    loss_l = np.inf
+    
+    for epoch in range(10**3):
+        loss_p = 0
+        y = Y[0]
+        for i in range(X.shape[0]):
+            xi = prepare_input(y,neigh_ndx)
+            y = model_percent(a_step_wgth,xi)
+
+            grad = grad_percent(a_step_wgth,xi,Y[i])#.reshape(18,16,3)
+            #grad = np.sum(grad, axis=0)
+            a_step_wgth = a_step_wgth - a_step_wgth*grad*(i+1)/X.shape[0]
+
+            loss_p += np.sum((model_percent(a_step_wgth,xi) - Y[i].reshape(-1,1))**2)
+        if loss_p > loss_l: 
+            #print('loss sum:',loss_p)
+            break
+
+        loss_l = loss_p
+
+        if epoch%100==0: 
+            #print('loss sum:',loss_p)
+            n = epoch//(100)
+            l, o = model(a_step_wgth,X,Y,neigh_ndx)
+            arr_last[n] = np.average(o,1, voter_w).reshape(-1)
+
+    l, o = model(a_step_wgth,X,Y,neigh_ndx)
+
+    txt_to_be_saved = (
+        str(i)
+        +' '
+        +np.array_str(arr_last).replace('\n',' ')
+        +''
+        +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
+
+    txt_to_be_saved = ' '.join(txt_to_be_saved.split())
+
+    q.put(txt_to_be_saved)
+    return txt_to_be_saved
+
+def output_input_each_epoch_lin_w(X, Y, i, q, neigh_ndx, voter_w):
+    arr_last = np.zeros((10,18))
+
+    a_wgth = np.random.rand(X.shape[1],X.shape[2])
+    loss_l = np.inf
+    
+    for epoch in range(10**3):
+        loss_p = 0
+        y = Y[0]
+        grad = np.zeros(X[0].shape)
+        
+        for i in range(1,X.shape[0]):
+            xi = prepare_input(y,neigh_ndx)
+            y = model_percent(a_wgth,xi)
+            grad += grad_percent(a_wgth,xi,Y[i])*(i+1)/X.shape[0]
+            loss_p += np.sum((model_percent(a_wgth,xi) - Y[i].reshape(-1,1))**2)
+        
+        grad = np.sum(grad, axis=0)
+        
+        if loss_p > loss_l: 
+            print('loss sum:',loss_p)
+            break
+        a_wgth = a_wgth - step*grad
+        loss_l = loss_p
+
+        if epoch%100==0: 
+            #print('loss sum:',loss_p)
+            n = epoch//(100)
+            l, o = model(a_wgth,X,Y,neigh_ndx)
+            arr_last[n] = np.average(o,1, voter_w).reshape(-1)
+
+    l, o = model(a_wgth,X,Y,neigh_ndx)
+
+    txt_to_be_saved = (
+        str(i)
+        +' '
+        +np.array_str(arr_last).replace('\n',' ')
+        +''
+        +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
 
     txt_to_be_saved = ' '.join(txt_to_be_saved.split())
 
@@ -306,7 +488,7 @@ def each_year_no_time(X, Y, i, q, neigh_ndx):
 
 def program_finall():
     # acctual program
-    pool_data_middle, vote_list, neighbours, pool_d = prepare_data(True)
+    pool_data_middle, vote_list, neighbours, pool_d, voter_w = prepare_data(True)
     X, Y = prepare_input_data(pool_data_middle,vote_list,neighbours,pool_d)
 
     neigh_ndx = []
@@ -320,12 +502,23 @@ def program_finall():
         indexs = pool_d[0].index.values
         neigh_ndx.append(np.searchsorted(indexs, np.char.upper(neigh)))
 
-    fun_list = [all_at_once, each_year_no_time]
-    fil_list = ['all_at_once.txt', 'each_year_no_time.txt']
+    fun_list = [all_at_once, 
+                each_year_no_time, 
+                output_input_each_step, 
+                output_input_each_epoch,  
+                output_input_each_step_lin_w, 
+                output_input_each_epoch_lin_w]
+    fil_list = ['all_at_once.txt', 
+                'each_year_no_time.txt', 
+                'output_input_each_step.txt', 
+                'output_input_each_epoch.txt', 
+                'output_input_each_step_lin_w.txt', 
+                'output_input_each_epoch_lin_w.txt']
+
     for fun, fil in zip(fun_list,fil_list):
         # base file 
         bf = 'model/model1/'+fil 
         print(fil)
-        save_file(fun, X, Y, neigh_ndx, fn=bf, iter=1000)
+        save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=1000)
 
 program_finall()
