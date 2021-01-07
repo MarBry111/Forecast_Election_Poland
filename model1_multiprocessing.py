@@ -7,8 +7,10 @@ from tqdm import tqdm
 
 import multiprocessing as mp
 
+np.set_printoptions(threshold=np.inf)
+
 fn = 'model/model1/arr.txt'
-step = 1
+step = 0.1
 
 def listener(q, fn):
     '''listens for messages on the q, writes to file. '''
@@ -21,7 +23,6 @@ def listener(q, fn):
                 break
             f.write(str(m) + '\n')
             f.flush()
-
 
 def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=100):
     #must use Manager queue here, or will not work
@@ -49,7 +50,7 @@ def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=100):
     pool.close()
     pool.join()
 
-def prepare_data(pool_bool = True):
+def prepare_data(pool_bool = False):
     #============= Prepare data ===================
     # Voters 
     voters = pd.read_csv('dane_years/voters/percent_voters.csv',header=None)
@@ -134,12 +135,20 @@ def prepare_input_data(pool_data_middle,vote_list,neighbours,pool_d):
     X = np.array(X)
 
     Y = []
+
+    # 2001 = 0
+    # 2005 = 4
+    # 2007 = 6
+    # 2011 = 10
+    # 2015 = 14
+    # 2019 = 18
+
     for y in range(1,pool_data_middle.shape[0]):
         # iterate over districts
         tmp_y = []
         for d in range(vote_list[0].shape[0]):
             # 1. last election: Blue, Red, Gray
-            #    Blue/All
+            #    Blue/All (poll changed to real data on election year)
             # 2. neighbours
             # 3. one (1)
             lo = pool_d[y].iloc[d,:]
@@ -210,11 +219,11 @@ def model(a,x,Y,neigh_ndx):
     return loss, out
 
 def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18)) 
+    arr_last = np.zeros((100,18)) 
     np.random.seed(j)
     a_avg = np.random.rand(X.shape[1],X.shape[2])
 
-    for epoch in range(10):
+    for epoch in range(100):
         grad = grad_percent(a_avg,X,Y).reshape(18,16,3)
 
         #if epoch==0: print('first grad max/min:', np.max(grad),'/',np.min(grad))
@@ -239,7 +248,7 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
         str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
-        +''
+        +' '
         +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
 
     txt_to_be_saved = ' '.join(txt_to_be_saved.split())
@@ -248,7 +257,7 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18)) 
+    arr_last = np.zeros((100,18)) 
     np.random.seed(j)
 
     a_all = np.random.rand(X.shape[1],X.shape[2])
@@ -275,9 +284,9 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
 
         loss_l = loss_p
 
-        if epoch%100==0: 
+        if epoch%10==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(100)
+            n = epoch//(10)
             l, o = model(a_all,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -287,7 +296,7 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
         str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
-        +''
+        +' '
         +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
 
     txt_to_be_saved = ' '.join(txt_to_be_saved.split())
@@ -296,7 +305,7 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18)) 
+    arr_last = np.zeros((100,18)) 
     np.random.seed(j)
 
     a_step = np.random.rand(X.shape[1],X.shape[2])
@@ -333,7 +342,7 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
         str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
-        +''
+        +' '
         +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
 
     txt_to_be_saved = ' '.join(txt_to_be_saved.split())
@@ -342,13 +351,13 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18)) 
+    arr_last = np.zeros((100,18)) 
     np.random.seed(j)
 
     a_nxt = np.random.rand(X.shape[1],X.shape[2])
     loss_l = np.inf
     
-    for epoch in range(10**3):
+    for epoch in range(10**4):
         loss_p = 0
         y = Y[0]
         grad = np.zeros(X[0].shape)
@@ -367,9 +376,9 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
         a_nxt = a_nxt - step*grad
         loss_l = loss_p
 
-        if epoch%100==0: 
+        if epoch%1000==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(100)
+            n = epoch//(1000)
             l, o = model(a_nxt,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -379,7 +388,7 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
         str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
-        +''
+        +' '
         +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
 
     txt_to_be_saved = ' '.join(txt_to_be_saved.split())
@@ -388,7 +397,7 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18)) 
+    arr_last = np.zeros((100,18)) 
     np.random.seed(j)
 
     a_step_wgth = np.random.rand(X.shape[1],X.shape[2])
@@ -424,7 +433,7 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
         str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
-        +''
+        +' '
         +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
 
     txt_to_be_saved = ' '.join(txt_to_be_saved.split())
@@ -433,7 +442,7 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((10,18)) 
+    arr_last = np.zeros((100,18)) 
     np.random.seed(j)
 
     a_wgth = np.random.rand(X.shape[1],X.shape[2])
@@ -470,7 +479,7 @@ def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
         str(j).zfill(2)
         +' '
         +np.array_str(arr_last).replace('\n',' ')
-        +''
+        +' '
         +np.array_str(np.average(o,1, voter_w).reshape(-1)).replace('\n',' '))
 
     txt_to_be_saved = ' '.join(txt_to_be_saved.split())
@@ -500,12 +509,12 @@ def program_finall():
                 output_input_each_epoch,  
                 output_input_each_step_lin_w, 
                 output_input_each_epoch_lin_w]
-    fil_list = ['all_at_once.txt', 
-                'each_year_no_time.txt', 
-                'output_input_each_step.txt', 
-                'output_input_each_epoch.txt', 
-                'output_input_each_step_lin_w.txt', 
-                'output_input_each_epoch_lin_w.txt']
+    fil_list = ['all_at_onceII.txt', 
+                'each_year_no_timeII.txt', 
+                'output_input_each_stepII.txt', 
+                'output_input_each_epochII.txt', 
+                'output_input_each_step_lin_wII.txt', 
+                'output_input_each_epoch_lin_wII.txt']
 
     for fun, fil in zip(fun_list,fil_list):
         # base file 
