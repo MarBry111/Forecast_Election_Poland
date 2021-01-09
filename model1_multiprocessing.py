@@ -219,11 +219,11 @@ def model(a,x,Y,neigh_ndx):
     return loss, out
 
 def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((100,18)) 
+    arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
-    a_avg = np.random.rand(X.shape[1],X.shape[2])
+    a_avg = np.random.rand(X.shape[1],X.shape[2])-0.5
 
-    for epoch in range(100):
+    for epoch in range(10**4):
         grad = grad_percent(a_avg,X,Y).reshape(18,16,3)
 
         #if epoch==0: print('first grad max/min:', np.max(grad),'/',np.min(grad))
@@ -240,7 +240,11 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
 
         #if epoch%1==0: print('loss sum:',loss_p)
         l, o = model(a_avg,X,Y,neigh_ndx)
-        arr_last[epoch] = np.average(o,1, voter_w).reshape(-1)
+        if epoch%10==0: 
+            #print('loss sum:',loss_p)
+            n = epoch//(10)
+            l, o = model(a_avg,X,Y,neigh_ndx)
+            arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
     l, o = model(a_avg,X,Y,neigh_ndx)
 
@@ -257,13 +261,13 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((100,18)) 
+    arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
-    a_all = np.random.rand(X.shape[1],X.shape[2])
+    a_all = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
-    for epoch in range(10**3):
+    for epoch in range(10**4):
         shuffle_i = np.arange(X.shape[0])
         np.random.shuffle(shuffle_i)
         loss_p = 0
@@ -280,7 +284,7 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
 
         if loss_p > loss_l: 
             #print('loss sum:',loss_p)
-            break
+            pass
 
         loss_l = loss_p
 
@@ -305,10 +309,10 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((100,18)) 
+    arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
-    a_step = np.random.rand(X.shape[1],X.shape[2])
+    a_step = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
     for epoch in range(10**4):
@@ -326,13 +330,13 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
 
         if loss_p > loss_l: 
             #print('loss sum:',loss_p)
-            break
+            pass
 
         loss_l = loss_p
 
-        if epoch%1000==0: 
+        if epoch%10==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(1000)
+            n = epoch//(10)
             l, o = model(a_step,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -351,10 +355,10 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((100,18)) 
+    arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
-    a_nxt = np.random.rand(X.shape[1],X.shape[2])
+    a_nxt = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
     for epoch in range(10**4):
@@ -372,13 +376,13 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
         
         if loss_p > loss_l: 
             #print('loss sum:',loss_p)
-            break
+            pass
         a_nxt = a_nxt - step*grad
         loss_l = loss_p
 
-        if epoch%1000==0: 
+        if epoch%10==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(1000)
+            n = epoch//(10)
             l, o = model(a_nxt,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -397,13 +401,13 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((100,18)) 
+    arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
-    a_step_wgth = np.random.rand(X.shape[1],X.shape[2])
+    a_step_wgth = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
-    for epoch in range(10**3):
+    for epoch in range(10**4):
         loss_p = 0
         y = Y[0]
         for i in range(X.shape[0]):
@@ -417,13 +421,13 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
             loss_p += np.sum((model_percent(a_step_wgth,xi) - Y[i].reshape(-1,1))**2)
         if loss_p > loss_l: 
             #print('loss sum:',loss_p)
-            break
+            pass
 
         loss_l = loss_p
 
-        if epoch%100==0: 
+        if epoch%10==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(100)
+            n = epoch//(10)
             l, o = model(a_step_wgth,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -442,13 +446,13 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
     return txt_to_be_saved
 
 def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
-    arr_last = np.zeros((100,18)) 
+    arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
-    a_wgth = np.random.rand(X.shape[1],X.shape[2])
+    a_wgth = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
-    for epoch in range(10**3):
+    for epoch in range(10**4):
         loss_p = 0
         y = Y[0]
         grad = np.zeros(X[0].shape)
@@ -463,13 +467,13 @@ def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
         
         if loss_p > loss_l: 
             #print('loss sum:',loss_p)
-            break
+            pass
         a_wgth = a_wgth - step*grad
         loss_l = loss_p
 
-        if epoch%100==0: 
+        if epoch%10==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(100)
+            n = epoch//(10)
             l, o = model(a_wgth,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -489,7 +493,9 @@ def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
 
 def program_finall():
     # acctual program
-    pool_data_middle, vote_list, neighbours, pool_d, voter_w = prepare_data(True)
+    # T: par_in_reg_list
+    # F: reg_in_par_list 
+    pool_data_middle, vote_list, neighbours, pool_d, voter_w = prepare_data(False)
     X, Y = prepare_input_data(pool_data_middle,vote_list,neighbours,pool_d)
 
     neigh_ndx = []
@@ -509,16 +515,16 @@ def program_finall():
                 output_input_each_epoch,  
                 output_input_each_step_lin_w, 
                 output_input_each_epoch_lin_w]
-    fil_list = ['all_at_onceII.txt', 
-                'each_year_no_timeII.txt', 
-                'output_input_each_stepII.txt', 
-                'output_input_each_epochII.txt', 
-                'output_input_each_step_lin_wII.txt', 
-                'output_input_each_epoch_lin_wII.txt']
+    fil_list = ['all_at_once.txt', 
+                'each_year_no_time.txt', 
+                'output_input_each_step.txt', 
+                'output_input_each_epoch.txt', 
+                'output_input_each_step_lin_w.txt', 
+                'output_input_each_epoch_lin_w.txt']
 
     for fun, fil in zip(fun_list,fil_list):
         # base file 
-        bf = 'model/model1/'+fil 
+        bf = 'model/model1/'+fil.replace('.','_III.') 
         print(fil)
         save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=100)
 
