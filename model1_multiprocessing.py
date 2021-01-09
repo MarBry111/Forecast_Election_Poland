@@ -10,7 +10,7 @@ import multiprocessing as mp
 np.set_printoptions(threshold=np.inf)
 
 fn = 'model/model1/arr.txt'
-step = 0.1
+step = 1
 
 def listener(q, fn):
     '''listens for messages on the q, writes to file. '''
@@ -204,6 +204,7 @@ def prepare_input(y, neigh_ndx):
         avg_n = sum(avg_n)/len(neigh)
         tmp_x[d] = np.array([y[d,0], avg_n, 1])
     return(tmp_x)
+
 
 def model(a,x,Y,neigh_ndx):
     y = Y[0]
@@ -416,7 +417,7 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
 
             grad = grad_percent(a_step_wgth,xi,Y[i])#.reshape(18,16,3)
             #grad = np.sum(grad, axis=0)
-            a_step_wgth = a_step_wgth - a_step_wgth*grad*(i+1)/X.shape[0]
+            a_step_wgth = a_step_wgth - grad*(i+1)/X.shape[0]
 
             loss_p += np.sum((model_percent(a_step_wgth,xi) - Y[i].reshape(-1,1))**2)
         if loss_p > loss_l: 
@@ -522,9 +523,9 @@ def program_finall():
                 'output_input_each_step_lin_w.txt', 
                 'output_input_each_epoch_lin_w.txt']
 
-    for fun, fil in zip(fun_list,fil_list):
+    for fun, fil in zip([fun_list[4]],[fil_list[4]]):
         # base file 
-        bf = 'model/model1/'+fil.replace('.','_III.') 
+        bf = 'model/model1/'+fil.replace('.','_IIIv2.') 
         print(fil)
         save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=100)
 
