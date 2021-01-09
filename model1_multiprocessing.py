@@ -4,13 +4,17 @@ import os
 from poll_data import party_in_region, region_in_party
 import pickle
 from tqdm import tqdm
+import sys
 
 import multiprocessing as mp
 
 np.set_printoptions(threshold=np.inf)
 
+step = 0.1
+
+if(len(sys.argv)>1): step = float(sys.argv[1])
+    
 fn = 'model/model1/arr.txt'
-step = 1
 
 def listener(q, fn):
     '''listens for messages on the q, writes to file. '''
