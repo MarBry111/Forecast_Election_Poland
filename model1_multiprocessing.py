@@ -243,6 +243,8 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
 
         loss_p = np.sum((model_percent(a_avg,X) - Y.reshape(-1,1))**2)
 
+        if loss_p == np.nan: break
+
         #if epoch%1==0: print('loss sum:',loss_p)
         l, o = model(a_avg,X,Y,neigh_ndx)
         if epoch%10==0: 
@@ -287,9 +289,7 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
 
             loss_p += np.sum((model_percent(a_all,X[i]) - Y[i].reshape(-1,1))**2)
 
-        if loss_p > loss_l: 
-            #print('loss sum:',loss_p)
-            pass
+        if loss_p == np.nan: break
 
         loss_l = loss_p
 
@@ -333,9 +333,7 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
 
             loss_p += np.sum((model_percent(a_step,xi) - Y[i].reshape(-1,1))**2)
 
-        if loss_p > loss_l: 
-            #print('loss sum:',loss_p)
-            pass
+        if loss_p == np.nan: break
 
         loss_l = loss_p
 
@@ -379,9 +377,8 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
         
         grad = np.sum(grad, axis=0)
         
-        if loss_p > loss_l: 
-            #print('loss sum:',loss_p)
-            pass
+        if loss_p == np.nan: break
+
         a_nxt = a_nxt - step*grad
         loss_l = loss_p
 
@@ -424,9 +421,8 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
             a_step_wgth = a_step_wgth - grad*(i+1)/X.shape[0]
 
             loss_p += np.sum((model_percent(a_step_wgth,xi) - Y[i].reshape(-1,1))**2)
-        if loss_p > loss_l: 
-            #print('loss sum:',loss_p)
-            pass
+        
+        if loss_p == np.nan: break
 
         loss_l = loss_p
 
@@ -470,9 +466,8 @@ def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
         
         grad = np.sum(grad, axis=0)
         
-        if loss_p > loss_l: 
-            #print('loss sum:',loss_p)
-            pass
+        if loss_p == np.nan: break
+
         a_wgth = a_wgth - step*grad
         loss_l = loss_p
 
@@ -527,9 +522,9 @@ def program_finall():
                 'output_input_each_step_lin_w.txt', 
                 'output_input_each_epoch_lin_w.txt']
 
-    for fun, fil in zip([fun_list[4]],[fil_list[4]]):
+    for fun, fil in zip(fun_list,fil_list):
         # base file 
-        bf = 'model/model1/'+fil.replace('.','_IIIv2.') 
+        bf = 'model/model1/'+fil.replace('.','_III_step'+str(step)+'.') 
         print(fil)
         save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=100)
 
