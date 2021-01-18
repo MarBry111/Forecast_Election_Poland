@@ -111,8 +111,8 @@ def prepare_data(pool_bool = False):
         reg_in_par_list.append(region_in_party(df_vote.iloc[:,:-1], pool[1]))
 
     for vl, i in zip(vote_list.copy(),[0,4,6,10,14,18]):    
-        par_in_reg_list[i] = vl.iloc[:,:-1]
-        reg_in_par_list[i] = vl.iloc[:,:-1]
+        par_in_reg_list[i] = vl.iloc[:,:-1].div(vl.iloc[:,:-1].sum(1),0) #vl.iloc[:,:-1]
+        reg_in_par_list[i] = vl.iloc[:,:-1].div(vl.iloc[:,:-1].sum(1),0) #vl.iloc[:,:-1]
 
     pool_d = par_in_reg_list if (pool_bool) else reg_in_par_list 
 
