@@ -195,6 +195,7 @@ def cluster_poll_data(path_in='dane_pdf/sondaze/Pools_poland.csv'):
 	df_new['Blue_mid'] = 0
 	df_new['Red_mid'] = 0
 	df_new['Gray_mid'] = 0
+	# best verison
 	# 2001-2003
 	col_b = ['LPR','PSL','PiS','Samoobrona']
 	col_r = ['PO']
@@ -237,44 +238,45 @@ def cluster_poll_data(path_in='dane_pdf/sondaze/Pools_poland.csv'):
 	df_ploting = df_ploting.div(df_ploting.sum(axis=1), axis=0).fillna(0)
 	df_ploting = df_ploting.sort_index()
 	df_ploting.to_csv("dane_years/percent_votes.csv")
-	# new grouping
-	# 2001-2006
-	col_b = ['LPR','PSL','PiS','Samoobrona']
-	col_r = ['PO']
-	col_g = [c for c in col_totoal if c not in col_r+col_b+['SLD']]
-	df_new['Blue_mid'][0:6] = df_new.loc[df_new.index[0:6], col_b].sum(axis = 1, skipna = True) 
-	df_new['Red_mid'][0:6] = df_new.loc[df_new.index[0:6], col_r].sum(axis = 1, skipna = True) 
-	df_new['Gray_mid'][0:6] = df_new.loc[df_new.index[0:6], col_g].sum(axis = 1, skipna = True) 
-	# 2007-2009
-	col_b = ['PiS','PSL']
-	col_r = ['SLD','PO','LiD']
-	col_g = [c for c in col_totoal if c not in col_r+col_b]
-	df_new['Blue_mid'][6:9] = df_new.loc[df_new.index[6:9], col_b].sum(axis = 1, skipna = True) 
-	df_new['Red_mid'][6:9] = df_new.loc[df_new.index[6:9], col_r].sum(axis = 1, skipna = True) 
-	df_new['Gray_mid'][6:9] = df_new.loc[df_new.index[6:9], col_g].sum(axis = 1, skipna = True) 
-	# 2010-2013
-	col_b = ['PiS']
-	col_r = ['SLD','PO','LiD','Ruch Palikota/Twój Ruch','PSL']
-	col_g = [c for c in col_totoal if c not in col_r+col_b]
-	df_new['Blue_mid'][9:13] = df_new.loc[df_new.index[9:13], col_b].sum(axis = 1, skipna = True) 
-	df_new['Red_mid'][9:13] = df_new.loc[df_new.index[9:13], col_r].sum(axis = 1, skipna = True) 
-	df_new['Gray_mid'][9:13] = df_new.loc[df_new.index[9:13], col_g].sum(axis = 1, skipna = True) 
-	# 2014-2017
-	col_b = ['PiS','PSL','Kukiz']#,'KORWIN/ Wolnośc/ KONFEDERACJA']
-	col_r = ['SLD','PO','Nowoczesna.pl']#,'Wiosna','Razem']
-	col_g = [c for c in col_totoal if c not in col_r+col_b]
-	df_new['Blue_mid'][13:17] = df_new.loc[df_new.index[13:17], col_b].sum(axis = 1, skipna = True) 
-	df_new['Red_mid'][13:17] = df_new.loc[df_new.index[13:17], col_r].sum(axis = 1, skipna = True) 
-	df_new['Gray_mid'][13:17] = df_new.loc[df_new.index[13:17], col_g].sum(axis = 1, skipna = True) 
-	# 2018-2020
-	col_b = ['PiS','KORWIN/ Wolnośc/ KONFEDERACJA']
-	col_r = ['SLD','PO','PSL']#,'Wiosna','Razem']
-	col_g = [c for c in col_totoal if c not in col_r+col_b]
-	df_new['Blue_mid'][17:] = df_new.loc[df_new.index[17:], col_b].sum(axis = 1, skipna = True) 
-	df_new['Red_mid'][17:] = df_new.loc[df_new.index[17:], col_r].sum(axis = 1, skipna = True) 
-	df_new['Gray_mid'][17:] = df_new.loc[df_new.index[17:], col_g].sum(axis = 1, skipna = True) 
-	# choosing interesting columns
-	df_ploting_2 = df_new.iloc[:-1,-3:]
-	df_ploting_2 = df_ploting_2.div(df_ploting_2.sum(axis=1), axis=0).fillna(0)
-	# save to file
-	df_ploting_2.to_csv('dane_years/pools_edited_middle_year_of_voting.csv')
+	if False:
+		# old groouping
+		# 2001-2006
+		col_b = ['LPR','PSL','PiS','Samoobrona']
+		col_r = ['PO']
+		col_g = [c for c in col_totoal if c not in col_r+col_b+['SLD']]
+		df_new['Blue_mid'][0:6] = df_new.loc[df_new.index[0:6], col_b].sum(axis = 1, skipna = True) 
+		df_new['Red_mid'][0:6] = df_new.loc[df_new.index[0:6], col_r].sum(axis = 1, skipna = True) 
+		df_new['Gray_mid'][0:6] = df_new.loc[df_new.index[0:6], col_g].sum(axis = 1, skipna = True) 
+		# 2007-2009 
+		col_b = ['PiS','PSL']
+		col_r = ['SLD','PO','LiD']
+		col_g = [c for c in col_totoal if c not in col_r+col_b]
+		df_new['Blue_mid'][6:9] = df_new.loc[df_new.index[6:9], col_b].sum(axis = 1, skipna = True) 
+		df_new['Red_mid'][6:9] = df_new.loc[df_new.index[6:9], col_r].sum(axis = 1, skipna = True) 
+		df_new['Gray_mid'][6:9] = df_new.loc[df_new.index[6:9], col_g].sum(axis = 1, skipna = True) 
+		# 2010-2013
+		col_b = ['PiS']
+		col_r = ['SLD','PO','LiD','Ruch Palikota/Twój Ruch','PSL']
+		col_g = [c for c in col_totoal if c not in col_r+col_b]
+		df_new['Blue_mid'][9:13] = df_new.loc[df_new.index[9:13], col_b].sum(axis = 1, skipna = True) 
+		df_new['Red_mid'][9:13] = df_new.loc[df_new.index[9:13], col_r].sum(axis = 1, skipna = True) 
+		df_new['Gray_mid'][9:13] = df_new.loc[df_new.index[9:13], col_g].sum(axis = 1, skipna = True) 
+		# 2014-2017
+		col_b = ['PiS','PSL','Kukiz']#,'KORWIN/ Wolnośc/ KONFEDERACJA']
+		col_r = ['SLD','PO','Nowoczesna.pl']#,'Wiosna','Razem']
+		col_g = [c for c in col_totoal if c not in col_r+col_b]
+		df_new['Blue_mid'][13:17] = df_new.loc[df_new.index[13:17], col_b].sum(axis = 1, skipna = True) 
+		df_new['Red_mid'][13:17] = df_new.loc[df_new.index[13:17], col_r].sum(axis = 1, skipna = True) 
+		df_new['Gray_mid'][13:17] = df_new.loc[df_new.index[13:17], col_g].sum(axis = 1, skipna = True) 
+		# 2018-2020
+		col_b = ['PiS','KORWIN/ Wolnośc/ KONFEDERACJA']
+		col_r = ['SLD','PO','PSL']#,'Wiosna','Razem']
+		col_g = [c for c in col_totoal if c not in col_r+col_b]
+		df_new['Blue_mid'][17:] = df_new.loc[df_new.index[17:], col_b].sum(axis = 1, skipna = True) 
+		df_new['Red_mid'][17:] = df_new.loc[df_new.index[17:], col_r].sum(axis = 1, skipna = True) 
+		df_new['Gray_mid'][17:] = df_new.loc[df_new.index[17:], col_g].sum(axis = 1, skipna = True) 
+		# choosing interesting columns
+		df_ploting_2 = df_new.iloc[:-1,-3:]
+		df_ploting_2 = df_ploting_2.div(df_ploting_2.sum(axis=1), axis=0).fillna(0)
+		# save to file
+		df_ploting_2.to_csv('dane_years/pools_edited_middle_year_of_voting .csv')
