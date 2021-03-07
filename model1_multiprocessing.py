@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
-from poll_data import party_in_region, region_in_party
+from functions.poll_data import party_in_region, region_in_party
 import pickle
 from tqdm import tqdm
 import sys
@@ -193,9 +193,9 @@ def grad_percent(a,x,y):
     x = x.reshape(-1, 3)
     y = y.reshape(-1, 1)
     y1 = -(2 * 
-          ( y - 1/(1+np.exp(-np.sum(x.dot(a.T),1,keepdims=True))) ) * 
-          1/(1+np.exp(-np.sum(x.dot(a.T),1,keepdims=True)))**2 *
-          np.exp(-np.sum(x.dot(a.T),1,keepdims=True)) *
+          ( y - 1/(1+np.exp(-np.sum(x*a,1,keepdims=True))) ) * 
+          1/(1+np.exp(-np.sum(x*a,1,keepdims=True)))**2 *
+          np.exp(-np.sum(x*a,1,keepdims=True)) *
           x)
     
     return y1
@@ -228,7 +228,7 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
     np.random.seed(j)
     a_avg = np.random.rand(X.shape[1],X.shape[2])-0.5
 
-    for epoch in range(10**4):
+    for epoch in range(10**3):
         grad = grad_percent(a_avg,X,Y).reshape(18,16,3)
 
         #if epoch==0: print('first grad max/min:', np.max(grad),'/',np.min(grad))
@@ -243,13 +243,13 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
 
         loss_p = np.sum((model_percent(a_avg,X) - Y.reshape(-1,1))**2)
 
-        if loss_p == np.nan: break
+        #if loss_p == np.nan: break
 
         #if epoch%1==0: print('loss sum:',loss_p)
         l, o = model(a_avg,X,Y,neigh_ndx)
-        if epoch%10==0: 
+        if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(10)
+            n = epoch
             l, o = model(a_avg,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -274,7 +274,7 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
     a_all = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
-    for epoch in range(10**4):
+    for epoch in range(10**3):
         shuffle_i = np.arange(X.shape[0])
         np.random.shuffle(shuffle_i)
         loss_p = 0
@@ -289,13 +289,13 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
 
             loss_p += np.sum((model_percent(a_all,X[i]) - Y[i].reshape(-1,1))**2)
 
-        if loss_p == np.nan: break
+        #if loss_p == np.nan: break
 
         loss_l = loss_p
 
-        if epoch%10==0: 
+        if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(10)
+            n = epoch
             l, o = model(a_all,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -320,7 +320,7 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
     a_step = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
-    for epoch in range(10**4):
+    for epoch in range(10**3):
         loss_p = 0
         y = Y[0]
         for i in range(X.shape[0]):
@@ -333,13 +333,13 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
 
             loss_p += np.sum((model_percent(a_step,xi) - Y[i].reshape(-1,1))**2)
 
-        if loss_p == np.nan: break
+        #if loss_p == np.nan: break
 
         loss_l = loss_p
 
-        if epoch%10==0: 
+        if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(10)
+            n = epoch
             l, o = model(a_step,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -364,7 +364,7 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
     a_nxt = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
-    for epoch in range(10**4):
+    for epoch in range(10**3):
         loss_p = 0
         y = Y[0]
         grad = np.zeros(X[0].shape)
@@ -377,14 +377,14 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
         
         grad = np.sum(grad, axis=0)
         
-        if loss_p == np.nan: break
+        #if loss_p == np.nan: break
 
         a_nxt = a_nxt - step*grad
         loss_l = loss_p
 
-        if epoch%10==0: 
+        if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(10)
+            n = epoch
             l, o = model(a_nxt,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -409,7 +409,7 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
     a_step_wgth = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
-    for epoch in range(10**4):
+    for epoch in range(10**3):
         loss_p = 0
         y = Y[0]
         for i in range(X.shape[0]):
@@ -422,13 +422,13 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
 
             loss_p += np.sum((model_percent(a_step_wgth,xi) - Y[i].reshape(-1,1))**2)
         
-        if loss_p == np.nan: break
+        #if loss_p == np.nan: break
 
         loss_l = loss_p
 
-        if epoch%10==0: 
+        if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(10)
+            n = epoch//(1)
             l, o = model(a_step_wgth,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -453,7 +453,7 @@ def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
     a_wgth = np.random.rand(X.shape[1],X.shape[2])-0.5
     loss_l = np.inf
     
-    for epoch in range(10**4):
+    for epoch in range(10**3):
         loss_p = 0
         y = Y[0]
         grad = np.zeros(X[0].shape)
@@ -466,14 +466,14 @@ def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
         
         grad = np.sum(grad, axis=0)
         
-        if loss_p == np.nan: break
+        #if loss_p == np.nan: break
 
         a_wgth = a_wgth - step*grad
         loss_l = loss_p
 
-        if epoch%10==0: 
+        if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(10)
+            n = epoch//(1)
             l, o = model(a_wgth,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -524,7 +524,7 @@ def program_finall():
 
     for fun, fil in zip(fun_list,fil_list):
         # base file 
-        bf = 'model/model1/'+fil.replace('.','_III_step'+str(step)+'.') 
+        bf = 'model/model1/'+fil.replace('.','_step'+str(step)+'.') 
         print(fil)
         save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=100)
 
