@@ -249,7 +249,7 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
         l, o = model(a_avg,X,Y,neigh_ndx)
         if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch
+            n = epoch//1
             l, o = model(a_avg,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -295,7 +295,7 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
 
         if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch
+            n = epoch//1
             l, o = model(a_all,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -339,7 +339,7 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
 
         if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch
+            n = epoch//1
             l, o = model(a_step,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -384,7 +384,7 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
 
         if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch
+            n = epoch//1
             l, o = model(a_nxt,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -428,7 +428,7 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
 
         if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(1)
+            n = epoch//1//(1)
             l, o = model(a_step_wgth,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -473,7 +473,7 @@ def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
 
         if epoch%1==0: 
             #print('loss sum:',loss_p)
-            n = epoch//(1)
+            n = epoch//1//(1)
             l, o = model(a_wgth,X,Y,neigh_ndx)
             arr_last[n] = np.average(o,1, voter_w).reshape(-1)
 
@@ -524,7 +524,7 @@ def program_finall():
 
     for fun, fil in zip(fun_list,fil_list):
         # base file 
-        bf = 'model/model1/'+fil.replace('.','_step'+str(step)+'.') 
+        bf = 'model/model1/'+fil.replace('.','step'+str(step)+'.') 
         print(fil)
         save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=100)
 

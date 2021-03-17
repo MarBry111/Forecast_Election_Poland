@@ -24,13 +24,14 @@ def connect_one_df(year):
 			folder_1 = folder+o+'/'
 			powiaty = os.listdir(folder_1)
 			#dfTOTAL = pd.concat([dfTOTAL, add_name_of_district(fol =folder_1, ok = powiaty ,d = 'O_')])
-			dfTOTAL = pd.concat([dfTOTAL, add_name_of_district(fol =folder_1, ok = powiaty ,d = '')])
-			'''
+			#dfTOTAL = pd.concat([dfTOTAL, add_name_of_district(fol =folder_1, ok = powiaty ,d = '')])
+			
 			for p in powiaty:
 				if os.path.isdir(folder_1+p):
 					folder_2 = folder_1+p+'/'
 					gminy = os.listdir(folder_2)
 					dfTOTAL = pd.concat([dfTOTAL, add_name_of_district(fol =folder_2, ok = gminy ,d = 'P_')])		
+					'''
 					for g in gminy:
 						if os.path.isdir(folder_2+g):
 							folder_3 = folder_2+g+'/'
