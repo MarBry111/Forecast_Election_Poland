@@ -28,7 +28,7 @@ def listener(q, fn):
             f.write(str(m) + '\n')
             f.flush()
 
-def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=100):
+def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=100, step=0.1):
     #must use Manager queue here, or will not work
     manager = mp.Manager()
     q = manager.Queue(1)    
@@ -41,7 +41,7 @@ def save_file(func, X, Y, neigh_ndx, voter_w, fn, iter=100):
     jobs = []
     with tqdm(total=iter) as pbar:
         for j in range(iter):
-            job = pool.apply_async(func, (X, Y, j, q, neigh_ndx, voter_w))
+            job = pool.apply_async(func, (X, Y, j, q, neigh_ndx, voter_w, step))
             jobs.append(job)
 
     # collect results from the workers through the pool result queue
@@ -223,7 +223,7 @@ def model(a,x,Y,neigh_ndx):
         out[year] = y
     return loss, out
 
-def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
+def all_at_once(X, Y, j, q, neigh_ndx, voter_w, step):
     arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
     a_avg = np.random.rand(X.shape[1],X.shape[2])-0.5
@@ -267,7 +267,7 @@ def all_at_once(X, Y, j, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
+def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w, step):
     arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
@@ -313,7 +313,7 @@ def each_year_no_time(X, Y, j, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
+def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w, step):
     arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
@@ -357,7 +357,7 @@ def output_input_each_step(X, Y, j, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
+def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w, step):
     arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
@@ -402,7 +402,7 @@ def output_input_each_epoch(X, Y, j, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
+def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w, step):
     arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
@@ -446,7 +446,7 @@ def output_input_each_step_lin_w(X, Y, j, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
+def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w, step):
     arr_last = np.zeros((1000,18)) 
     np.random.seed(j)
 
@@ -491,7 +491,7 @@ def output_input_each_epoch_lin_w(X, Y, j, q, neigh_ndx, voter_w):
     q.put(txt_to_be_saved)
     return txt_to_be_saved
 
-def program_finall():
+def program_finall(step):
     # acctual program
     # T: par_in_reg_list
     # F: reg_in_par_list 
@@ -512,20 +512,22 @@ def program_finall():
     fun_list = [all_at_once, 
                 each_year_no_time, 
                 output_input_each_step, 
-                output_input_each_epoch,  
-                output_input_each_step_lin_w, 
-                output_input_each_epoch_lin_w]
+                output_input_each_epoch]  
+                #output_input_each_step_lin_w, 
+                #output_input_each_epoch_lin_w]
     fil_list = ['all_at_once.txt', 
                 'each_year_no_time.txt', 
                 'output_input_each_step.txt', 
-                'output_input_each_epoch.txt', 
-                'output_input_each_step_lin_w.txt', 
-                'output_input_each_epoch_lin_w.txt']
+                'output_input_each_epoch.txt'] 
+                #'output_input_each_step_lin_w.txt', 
+                #'output_input_each_epoch_lin_w.txt']
 
     for fun, fil in zip(fun_list,fil_list):
         # base file 
-        bf = 'model/model1/'+fil.replace('.','step'+str(step)+'.') 
+        bf = 'model/model_I/'+fil.replace('.','step'+str(step)+'.') 
         print(fil)
-        save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=100)
+        save_file(fun, X, Y, neigh_ndx, voter_w, fn=bf, iter=100, step=step)
 
-program_finall()
+program_finall(1)
+program_finall(0.1)
+program_finall(0.01)
